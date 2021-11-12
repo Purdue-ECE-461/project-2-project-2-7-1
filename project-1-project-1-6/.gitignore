@@ -1,0 +1,6 @@
+# VSCode
+.vscode/
+*.env
+
+app/.idea/
+*.log

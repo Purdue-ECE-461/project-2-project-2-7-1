@@ -1,0 +1,12 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+app,com.project1,NpmAPI,33,10,6,0,9,4,4,1,1,1
+app,com.project1,GithubStats,287,497,22,14,75,111,22,16,7,13
+app,com.project1,ParseJacoco,80,0,4,0,17,0,5,0,3,0
+app,com.project1,GitCloner,108,0,10,0,27,0,10,0,5,0
+app,com.project1,License,85,125,10,8,20,28,7,7,1,4
+app,com.project1,Module,380,51,36,0,56,16,31,8,13,8
+app,com.project1,Cloc,36,304,7,21,8,63,6,19,0,11
+app,com.project1,Mvn.new FilenameFilter() {...},11,0,0,0,2,0,2,0,2,0
+app,com.project1,App,301,0,25,0,74,0,16,0,3,0
+app,com.project1,Mvn,128,0,8,0,22,0,8,0,4,0
+app,com.project1,InputReader,49,100,4,6,11,30,5,6,2,4

@@ -1,0 +1,6 @@
+https://www.npmjs.com/package/browserify
+https://www.npmjs.com/package/express
+https://github.com/lodash/lodash
+https://github.com/cloudinary/cloudinary_npm
+https://www.npmjs.com/package/react
+https://github.com/expressjs/express

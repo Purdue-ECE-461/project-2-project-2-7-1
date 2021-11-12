@@ -1,0 +1,4 @@
+https://www.npmjs.com/package/browserify/invalidFormat
+https://www.npmjs.com/package/invalidPackage
+https://www.npmjs.com/package/
+https://www.npmjs.com/pakcage
