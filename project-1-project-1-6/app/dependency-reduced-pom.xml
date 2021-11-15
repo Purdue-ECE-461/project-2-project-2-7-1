@@ -106,6 +106,14 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.google.cloud.functions</groupId>
+        <artifactId>function-maven-plugin</artifactId>
+        <version>0.10.0</version>
+        <configuration>
+          <functionTarget>functions.ModuleEvaluator</functionTarget>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <properties>

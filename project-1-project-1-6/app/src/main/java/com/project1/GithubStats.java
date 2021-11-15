@@ -81,7 +81,7 @@ public class GithubStats {
         //-----------------------------ITERABLE CONTAINING INFORMATION OF COLLABORATORS ------------------------------------
             try {
                 PagedIterable<GHRepositoryStatistics.ContributorStats> contributorStats = statistics.getContributorStats(true);
-                contributorsNum = contributorStats != null ? contributorStats.toList().size() : 0;
+                contributorsNum = contributorStats == null ? 0 : contributorStats.toList().size();
             } catch (IOException e) {
                 logger.debug("Error retrieving contributor statistics from repository: " + repositoryName);
             } catch (InterruptedException e) {
@@ -165,7 +165,6 @@ public class GithubStats {
 
     private boolean isValidDependency(String dependency){
         boolean isValid = !(dependency.contains("~") || dependency.contains("=") || dependency.contains("<") || dependency.contains(">") || dependency.contains("*"));
-        System.out.println(dependency + " == " + isValid);
         return isValid;
     }
 
@@ -176,27 +175,32 @@ public class GithubStats {
         JSONParser jsonParser = new JSONParser();
 
         try (FileReader reader = new FileReader("target/" + name + "/package.json")) {
-
             JSONObject packageJson = new JSONObject(jsonParser.parse(reader).toString());
-            System.out.println(packageJson);
-            JSONObject dependencies = (JSONObject) packageJson.get("dependencies");
-            Iterator<String> keys = dependencies.keys();
-            while(keys.hasNext()) {
-                String key = keys.next();
-                totalDependencies += 1;
-                if (isValidDependency(dependencies.get(key).toString())) {
-                    validDependencies += 1;
+            if(packageJson.has("dependencies")){
+                JSONObject dependencies = (JSONObject) packageJson.get("dependencies");
+                Iterator<String> keys = dependencies.keys();
+                while(keys.hasNext()) {
+                    String key = keys.next();
+                    totalDependencies += 1;
+                    if (isValidDependency(dependencies.get(key).toString())) {
+                        validDependencies += 1;
+                    }
                 }
+            } else{
+                logger.info("Repository provided does not have package.json file");
+                return 1;
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.info("Could not find package.json file to evaluate dependencies score");
+            return 1;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info("IO exception package.json evaluating dependencies score");
+            return 1;
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.info("Parse exception package.json evaluating dependencies score");
+            return 1;
         }
         if(totalDependencies > 0){
-            System.out.println(validDependencies/totalDependencies);
             return validDependencies/totalDependencies;
         } else{
             return 1;

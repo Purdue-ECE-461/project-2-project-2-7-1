@@ -119,7 +119,7 @@ public class App
             }
 
             Collections.sort(modules, Collections.reverseOrder());
-            System.out.println("URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE");
+            System.out.println("URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE DEPENDENCIES_SCORE");
             for(Module m : modules){
                 System.out.println(m);
             }
@@ -128,6 +128,9 @@ public class App
         }
     }
 
+//    private static void evalator(){
+//        ModuleEvaluator md = new ModuleEvaluator();
+//    }
     static Level decode(String level){
 
         switch (level){
