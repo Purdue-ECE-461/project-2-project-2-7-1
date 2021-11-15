@@ -6,8 +6,6 @@ from rest_framework.response import Response
 from packages.models import Package, metadata, data
 from packages.serializers import PackageSerializer
 from rest_framework.parsers import JSONParser
-import base64
-import json
 
 #this commented out section is for specifically downloading the file
         #data = serializer.data
@@ -18,6 +16,7 @@ import json
         #return response
 
 # Create your views here.
+
 
 #used for specific id operations
 @api_view(['GET', 'DELETE', 'PUT'])
@@ -39,6 +38,7 @@ def package_element(request, id):
             package_serializer.save()
             return Response(package_serializer.data, status=status.HTTP_201_CREATED)
         return Response(package_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 #used for api package create call
 @api_view(['POST'])

@@ -3,6 +3,7 @@ from django.db.models.fields import BinaryField
 
 # Create your models here.
 
+
 class data(models.Model):
     Content = models.BinaryField()
     URL = models.CharField(max_length=70)
@@ -19,6 +20,7 @@ class metadata(models.Model):
 
     def __str__(self) -> str:
         return self.ID
+
 
 class Package(models.Model):
     metadata = models.OneToOneField(metadata, on_delete=models.CASCADE, default=None)

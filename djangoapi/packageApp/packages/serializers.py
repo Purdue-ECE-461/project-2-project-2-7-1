@@ -14,22 +14,25 @@ class BinarySerializerField(serializers.Field):
     def to_internal_value(self, data):
         return str.encode(data)
 
+
 class DataSerializer(serializers.ModelSerializer):
     Content = BinarySerializerField()
 
     def get_Content(self, obj):
         test = bytes(obj.Content)
-        return test
+        return test    
     
     class Meta:
         model = data
         fields = ('Content', 'URL', 'JSProgram')
         
+
 class MetaDataSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = metadata
         fields = ('Name', 'Version', 'ID')
+
 
 class PackageSerializer(serializers.ModelSerializer):
 
