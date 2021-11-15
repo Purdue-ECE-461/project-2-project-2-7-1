@@ -8,7 +8,7 @@ on:
     
 defaults:
   run:
-    working-directory: djangoapi
+    working-directory: djangoapi/packageApp
 
 jobs:
   build:
