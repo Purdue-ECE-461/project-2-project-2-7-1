@@ -14,25 +14,23 @@ public class InputReaderTest {
 //        System.setProperty("logFilename", logFile); //creating system property to be used inside log4j2.xml configuration file
 //        Configurator.setRootLevel(App.decode(logLevel));
 
-
-        String path = "some/invalid/invalidFilePath";
-        InputReader.read(path);
-
-        assertTrue(InputReader.getNames() == null);
-        assertTrue(InputReader.getOwners() == null);
-    }
-
-    @Test
-    public void testInvalidInput(){
-//        System.setProperty("logFilename", logFile); //creating system property to be used inside log4j2.xml configuration file
-//        Configurator.setRootLevel(App.decode(logLevel));
-
-
-        String path = "./src/test/java/com/project1/URLFiles/validPath.txt";
+        String path = "url?=https://github.com/cloudinary/cloudinary_npm";
         InputReader.read(path);
 
         assertTrue(InputReader.getNames() != null);
         assertTrue(InputReader.getOwners() != null);
-
     }
+
+//    @Test
+//    public void testInvalidInput(){
+////        System.setProperty("logFilename", logFile); //creating system property to be used inside log4j2.xml configuration file
+////        Configurator.setRootLevel(App.decode(logLevel));
+//
+//        String path = "some/invalid/invalidFilePath";
+//        InputReader.read(path);
+//
+//        assertTrue(InputReader.getNames() == null);
+//        assertTrue(InputReader.getOwners() == null);
+//
+//    }
 }
