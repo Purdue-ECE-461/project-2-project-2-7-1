@@ -11,32 +11,20 @@ import java.util.Scanner;
 import java.util.ArrayList;
 
 public class InputReader {
-    private static NpmAPI npmapi;
     private static final Logger logger = LogManager.getLogger(InputReader.class);
-    private static final ArrayList<String> originalUrls = null;
     private static ArrayList<String> urls = null;
-    private static ArrayList<String> owners = null;
-    private static ArrayList<String> names = null;
+    private static ArrayList<String> owners = new ArrayList<>();
+    private static ArrayList<String> names = new ArrayList<>();
+    private static NpmAPI npmapi = new NpmAPI();
 
-    public static void read(String filepath){
+    public static void read(String urlIn){
         urls = new ArrayList<>();
-        try {
-            File myObj = new File(filepath);
-            Scanner myReader = new Scanner(myObj);
-
-            while (myReader.hasNextLine()){
-                urls.add(myReader.nextLine());
-            }
-            myReader.close();
-
-        } catch (FileNotFoundException e) {
-            logger.debug("error in reading reading urls from text file");
+        if (urlIn != null) {
+            urls.add(urlIn);
+        } else {
+            logger.info("INPUT READER URL WAS NULL");
             return;
         }
-
-        npmapi = new NpmAPI();
-        owners = new ArrayList<>();
-        names = new ArrayList<>();
 
         for(int i = 0; i < urls.size(); i++)
         {

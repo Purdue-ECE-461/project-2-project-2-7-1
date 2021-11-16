@@ -9,20 +9,27 @@ import org.apache.commons.io.FileDeleteStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.io.BufferedWriter;
 import java.util.Collections;
 import java.util.List;
+import java.net.URL;
+import com.google.cloud.functions.HttpFunction;
+import com.google.cloud.functions.HttpRequest;
+import com.google.cloud.functions.HttpResponse;
 
 
-public class App
+public class App implements HttpFunction
 {
 
-    public static void main(String[] args) throws IOException {
+    public void service(HttpRequest request, HttpResponse response) throws IOException {
+        //INITIALIZE RESPONSE
+        response.setStatusCode(200);
+        response.setContentType("text/plain");
 
         //LOADING ENVIRONMENT VARIABLES
         String githubToken = System.getenv("GITHUB_TOKEN");
         String logLevel = System.getenv("LOG_LEVEL");
         String logFile = System.getenv("LOG_FILE");
-
         if(githubToken == null){
             System.out.println("Missing necessary github token. Exiting application...");
             System.exit(1);
@@ -39,19 +46,24 @@ public class App
         final Logger logger = LogManager.getLogger(App.class);
 
         //MAIN LOGIC
-        if(args[0].equals("test")){
-            Mvn mvn = new Mvn();
-            mvn.runTests();
-            try {
-                System.out.println(mvn + String.format("%.0f", ParseJacoco.getCoverage()*100) +"% line coverage achieved");
-            } catch (Exception e) {
-                System.out.println("Test runs failed");
-                System.exit(1);
-            }
-            System.exit(0);
+        BufferedWriter writer = response.getWriter();
+        String urlIn = request.getUri().split("\\?")[1];//getParameter("URL");
+        System.out.println("urlIn == "+urlIn);
+
+        if(urlIn == null){
+//            Mvn mvn = new Mvn();
+//            mvn.runTests();
+//            try {
+//                System.out.println(mvn + String.format("%.0f", ParseJacoco.getCoverage()*100) +"% line coverage achieved");
+//            } catch (Exception e) {
+//                System.out.println("Test runs failed");
+//                System.exit(1);
+//            }
+//            System.exit(0);
+            writer.write("PLEASE PROVIDE A MODULE LINK");
         }else{
             //READ INPUT
-            InputReader.read(args[0]);
+            InputReader.read(urlIn);
             List<String> owners =  InputReader.getOwners();
             List<String> names = InputReader.getNames();
             List<String> urls = InputReader.getUrls();
@@ -119,18 +131,14 @@ public class App
             }
 
             Collections.sort(modules, Collections.reverseOrder());
-            System.out.println("URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE DEPENDENCIES_SCORE");
+            //System.out.println("URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE DEPENDENCIES_SCORE");
             for(Module m : modules){
-                System.out.println(m);
+                writer.write(m.toString());
             }
 
-            System.exit(0);
         }
     }
 
-//    private static void evalator(){
-//        ModuleEvaluator md = new ModuleEvaluator();
-//    }
     static Level decode(String level){
 
         switch (level){

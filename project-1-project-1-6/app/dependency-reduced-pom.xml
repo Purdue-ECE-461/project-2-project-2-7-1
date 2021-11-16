@@ -111,14 +111,22 @@
         <artifactId>function-maven-plugin</artifactId>
         <version>0.10.0</version>
         <configuration>
-          <functionTarget>functions.ModuleEvaluator</functionTarget>
+          <functionTarget>com.project1.App</functionTarget>
         </configuration>
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.cloud.functions</groupId>
+      <artifactId>functions-framework-api</artifactId>
+      <version>1.0.4</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
   <properties>
-    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 </project>
