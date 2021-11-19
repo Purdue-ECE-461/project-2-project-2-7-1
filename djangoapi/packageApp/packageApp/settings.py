@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'packages'
+    'packages',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -78,10 +79,10 @@ WSGI_APPLICATION = 'packageApp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'project2461',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': '461proj2',
-        'HOST': '34.135.44.46',
+        'HOST': '35.222.217.114',
         'PORT': '5432',
     }
 }
@@ -141,3 +142,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication', ),
+   'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser', ),
+}

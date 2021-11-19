@@ -8,6 +8,7 @@
         {
             "name": "Python: Django",
             "type": "python",
+            "python":"${workspaceRoot}\\venv\\Scripts\\python",
             "request": "launch",
             "program": "${workspaceFolder}\\packageApp\\manage.py",
             "args": [
