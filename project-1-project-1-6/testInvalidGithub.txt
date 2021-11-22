@@ -1,4 +1,0 @@
-https://github.com/lodash/lodash/wrongFormat
-https://github.com/cloudinary/invalidPackage
-https://github.com/nullivex/
-https://github.com/nullivex
