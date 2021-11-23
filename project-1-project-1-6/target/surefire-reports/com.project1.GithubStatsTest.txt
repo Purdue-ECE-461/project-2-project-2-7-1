@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.project1.GithubStatsTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.192 s - in com.project1.GithubStatsTest
