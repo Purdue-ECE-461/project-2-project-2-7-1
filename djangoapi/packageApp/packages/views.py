@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from packages.models import Package, metadata, data
 from packages.serializers import PackageSerializer
@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 import requests
 
 #this commented out section is for specifically downloading the file
@@ -64,11 +65,17 @@ def package_create(request):
 
 
 @api_view(['PUT'])
+@authentication_classes([])
+@permission_classes([])
 def auth_put(request):
-    token = Token.objects.get()
-    user = User.get_username
 
-    return Response(token.data, status=status.HTTP_200_OK)
+    request_data = request.data
+
+    user, created = User.objects.get_or_create(username=request_data['User']['name'])
+
+    token, created = Token.objects.get_or_create(user_id=user.id)
+
+    return Response('bearer ' + token[0].key, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def package_rate(request, id):
