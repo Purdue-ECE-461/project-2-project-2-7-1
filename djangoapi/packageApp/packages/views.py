@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, response
 from rest_framework import status
@@ -12,6 +13,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 import requests
+import pytz
+from packages.models import TokenCounter
 
 #this commented out section is for specifically downloading the file
         #data = serializer.data
@@ -64,18 +67,40 @@ def package_create(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
-@authentication_classes([])
-@permission_classes([])
-def auth_put(request):
+class ObtainExpiringAuthToken(ObtainAuthToken):
+    def put(self, request):
+        
+        user, created = User.objects.get_or_create(username=request.data['User']['name'])
+        
+        token, created = Token.objects.get_or_create(user_id=user.id)
+        
+        counter, created = TokenCounter.objects.get_or_create(token_id=token.user_id, token_hitlimit=1000)
 
-    request_data = request.data
+        utc_now = datetime.datetime.utcnow() 
+        utc = pytz.UTC
+        
+        created_token = token.created.replace(tzinfo=utc)
+        
+        limit = utc_now - datetime.timedelta(hours=24)
+        
+        token_limit = limit.replace(tzinfo=utc)   
+        if not created and created_token < token_limit:
+            token.delete()
+            token = Token.objects.create(user_id=user.id)
+            token.created = datetime.datetime.utcnow()
+            token.save()
+            
+        if not created and counter.token_count >= counter.token_hitlimit:
+            counter.token_count = 0
+            counter.save()
+            token.delete()
+            token = Token.objects.create(user_id=user.id)
+            token.created = datetime.datetime.utcnow()
+            token.save()
+            
+        return Response('bearer ' + token.key, status=status.HTTP_200_OK)
 
-    user, created = User.objects.get_or_create(username=request_data['User']['name'])
-
-    token, created = Token.objects.get_or_create(user_id=user.id)
-
-    return Response('bearer ' + token[0].key, status=status.HTTP_200_OK)
+obtain_expiring_auth_token = ObtainExpiringAuthToken.as_view()
 
 @api_view(['GET'])
 def package_rate(request, id):

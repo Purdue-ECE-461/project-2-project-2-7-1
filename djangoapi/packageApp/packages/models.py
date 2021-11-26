@@ -28,4 +28,13 @@ class Package(models.Model):
 
     def __str__(self) -> str:
         return self.metadata.Name
+    
 
+class TokenCounter(models.Model):
+    
+    token_id = models.IntegerField()
+    token_count = models.IntegerField()
+    token_hitlimit = models.IntegerField()
+    
+    def __str__(self):
+        return self.token_id
