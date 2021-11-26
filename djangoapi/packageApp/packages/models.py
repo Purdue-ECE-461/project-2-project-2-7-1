@@ -33,7 +33,7 @@ class Package(models.Model):
 class TokenCounter(models.Model):
     
     token_id = models.IntegerField()
-    token_count = models.IntegerField()
+    token_count = models.IntegerField(default=0)
     token_hitlimit = models.IntegerField()
     
     def __str__(self):

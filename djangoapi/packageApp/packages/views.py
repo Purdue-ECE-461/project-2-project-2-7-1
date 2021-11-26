@@ -60,6 +60,28 @@ def package_create(request):
 
     if request.method == 'POST':
         request_data = request.data
+        #section to check if package is hihgly rated enough
+        
+        url = request_data['data']['URL']
+
+        r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
+
+        data = r.content.decode("utf-8")
+        scores = data.split(' ')
+
+        scores = {
+            "Total Score": scores[1],
+            "RampUp": scores[2],
+            "Correctness": scores[3],
+            "BusFactor": scores[4],
+            "ResponsiveMaintainer": scores[5],
+            "LicenseScore": scores[6],
+            "Dependency": scores[7]
+            }
+        
+        if float(scores['Total Score']) < .5:
+            return Response('Package did not recieve score above .5', status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = PackageSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()

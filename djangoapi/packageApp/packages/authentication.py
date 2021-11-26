@@ -27,7 +27,10 @@ class ExpiringTokenAuthentication(TokenAuthentication):
         
         token_limit = limit.replace(tzinfo=utc)
         
-        counter = TokenCounter.objects.get(token_id=token.user_id)
+        try:
+            counter = TokenCounter.objects.get(token_id=token.user_id)
+        except TokenCounter.DoesNotExist:
+            raise exceptions.AuthenticationFailed('Invalid counter')
 
         if created_token < token_limit:
             raise exceptions.AuthenticationFailed('Token has expired')
