@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>461 Module Registry</title>
+  </head>
+  <body>
+    <div class="container">
+        NPM Module Registry, Team 7
+    </div>
+
+    <form>  
+      Enter NPM Module Link  
+      <input type="text" name="ModuleLink"> 
+    </form>
+
+    <td class="select"><select id="selectedService" onchange="setService()">
+      <option value="upload">Upload</option>
+      <option value="download">Download</option>
+      <option value="evaluate">Evaluate</option>
+      <option value="delete">Delete</option>
+      </select>
+    </td>
+
+    <button onclick="queryApi()">Submit Request</button>
+    
+    <script>
+      function setService(){
+        
+      }
+    </script>
+
+    <script>
+      function queryApi() {
+        var service = document.getElementById("selectedService");
+        var npmUrl = document.getElementById("ModuleLink");
+      }
+    </script>
+
+    <!--Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  </body>
+</html>
