@@ -17,10 +17,10 @@
 
     <form>  
       Enter NPM Module Link  
-      <input type="text" name="ModuleLink"> 
+      <input type="text" id = "ModuleLink" name="ModuleLink" required> 
     </form>
 
-    <td class="select"><select id="selectedService" onchange="setService()">
+    <td class="select"><select name="selectedService" id="selectedService" >
       <option value="upload">Upload</option>
       <option value="download">Download</option>
       <option value="evaluate">Evaluate</option>
@@ -29,22 +29,29 @@
     </td>
 
     <button onclick="queryApi()">Submit Request</button>
-    
-    <script>
-      function setService(){
-        
-      }
-    </script>
 
     <script>
       function queryApi() {
         var service = document.getElementById("selectedService");
         var npmUrl = document.getElementById("ModuleLink");
+        if(npmUrl.validity.valueMissing){
+          alert("Link to NPM module must be provided");
+        }
+        //<!-- Missing if statements for too long of an input for security case
+        // Still need to decide what is the longest possible string-->
+        if(service == "upload"){
+            //upload api query
+        } else if(service == "download"){
+            //download api query
+        } else if(service == "evaluate"){
+            //evaluate api query
+        } else {
+            //delete api query
+        }
       }
     </script>
 
     <!--Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
   </body>
 </html>
