@@ -24,19 +24,19 @@
 
     <form>  
       Enter NPM Module Link  
-      <input type="text" aria-labelledby = "moduleLink" id = "moduleLink" name="moduleLink" maxlength="2048"> 
-
-      <td class="select"><select aria-label="selectedService" name="selectedService" id="selectedService" >
-        <option value="ingest">Ingest</option> 
-        <option value="upload">Upload</option>
-        <option value="download">Download</option>
-        <option value="evaluate">Evaluate</option>
-        <option value="delete">Delete</option>
-        </select>
-      </td>
-  
-      <button onclick="queryApi()">Submit Request</button>
+      <input type="text" aria-labelledby = "moduleLink" id = "moduleLink" name="npmURL" maxlength="2048" > 
     </form>
+
+    <td class="select"><select aria-label="selectedService" name="selectedService" id="selectedService" >
+      <option value="ingest">Ingest</option> 
+      <option value="upload">Upload</option>
+      <option value="download">Download</option>
+      <option value="evaluate">Evaluate</option>
+      <option value="delete">Delete</option>
+      </select>
+    </td>
+
+    <button onclick="queryApi()">Submit Request</button>
 
     <script>
       let apiAddres = "http://127.0.0.1:8000";
@@ -59,8 +59,21 @@
         }
 
         var xhr = new XMLHttpRequest();
-        xhr.open("PUT", apiAddres + path, true);
+        xhr.open("PUT", apiAddres + path, false);
         xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function(){
+          if (xhr.readyState === xhr.DONE) {
+            if (xhr.status === 200){
+              //alert("Query sent succesfuly");
+            }
+          }
+        };
+        xhr.onreadystatechange = function() { 
+          if (this.readyState == 4) {
+            asyncProc(this);
+          } 
+        };
+        
         xhr.send(JSON.stringify({"User": {
           "name": usr,
           "isAdmin": true
@@ -68,26 +81,52 @@
           "Secret": {
               "password": pwd
           }}));
-        // xhr.onload = function(){
-        //   alert(this.responseText);
-        //   console.log(this.responseText);
-        // };
-        alert(xhr.responseText);
-        return;
+          
+        alert("returning == "+ xhr.responseText);
+        return xhr.responseText;
       }
-
 
       //ece461defaultadmin
       //correcthorsebatterystaple123(!__+@**(A
 
-      function serviceIngest(){
-        var npmUrl = document.getElementById("moduleLink").value;
+      function serviceIngest(credentials){
+        var path = "/project2/package";
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+
         if(npmUrl == ""){
           alert("Link to NPM module must be provided");
           return;
         }
-        alert("i am here");
-        alert("link == " + npmUrl.value);
+
+        if(!npmUrl.includes("/")){
+          alert("Please provide a valid link for ingestion");
+          return;
+        }
+
+        var name = npmUrl.split("/").at(-1);
+        var xhrIng = new XMLHttpRequest();
+
+        xhrIng.open("POST", apiAddres + path, true);
+        xhrIng.setRequestHeader('X-Authorization', credentials);
+        xhrIng.onload = function(){
+          if (xhrIng.readyState === xhrIng.DONE) {
+            if (xhrIng.status === 200){
+              alert("Package Ingested Succesfully" + xhrIng.responseText);
+            }
+          }
+        };
+        
+        xhrIng.send(JSON.stringify({"metadata": {
+            "Name": name,
+            "Version": "1.0.0",
+            "ID": name
+          },
+          "data": {
+              "URL": npmUrl,
+              "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+          }
+        }));
+                
         return;
       }
 
@@ -96,11 +135,11 @@
         //<!-- Missing if statements for too long of an input for security case
         // Still need to decide what is the longest possible string-->
         
-        getCredentials();
-        
+        const credentials = getCredentials();
+        alert("main creds == "+ credentials);
         if(service == "ingest"){
             //ingest from link
-            serviceIngest();
+            serviceIngest(credentials);
         } else if(service == "upload"){
             //upload api query
         } else if(service == "download"){
