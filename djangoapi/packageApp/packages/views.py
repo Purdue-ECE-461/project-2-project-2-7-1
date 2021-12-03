@@ -2,7 +2,7 @@ import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, response
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from packages.models import Package, metadata, data
 from packages.serializers import PackageSerializer
@@ -15,6 +15,8 @@ from django.contrib.auth.models import User
 import requests
 import pytz
 from packages.models import TokenCounter
+from urllib.request import urlopen
+import base64
 
 #this commented out section is for specifically downloading the file
         #data = serializer.data
@@ -33,7 +35,7 @@ def package_element(request, id):
     try:
         post = Package.objects.get(metadata=id)
     except Package.DoesNotExist:
-        return HttpResponse(status=404)
+        return HttpResponse(status=400)
 
     if request.method == 'GET':
         serializer = PackageSerializer(post)
@@ -50,42 +52,58 @@ def package_element(request, id):
         package_serializer = PackageSerializer(post, data=package_data) 
         if package_serializer.is_valid():
             package_serializer.save()
-            return Response(package_serializer.data, status=status.HTTP_200_OK)
-        return Response(package_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 #used for api package create call
 @api_view(['POST'])
 def package_create(request):
+    
+    returnData = {}
 
     if request.method == 'POST':
         request_data = request.data
         #section to check if package is hihgly rated enough
         
-        url = request_data['data']['URL']
+        #if package has URL then it needs to be ingested and scored
+        if 'URL' in request_data['data']:
+            url = request_data['data']['URL']
+            
+            r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
 
-        r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
+            data = r.content.decode("utf-8")
+            scores = data.split(' ')
 
-        data = r.content.decode("utf-8")
-        scores = data.split(' ')
-
-        scores = {
-            "Total Score": scores[1],
-            "RampUp": scores[2],
-            "Correctness": scores[3],
-            "BusFactor": scores[4],
-            "ResponsiveMaintainer": scores[5],
-            "LicenseScore": scores[6],
-            "Dependency": scores[7]
-            }
+            scores = {
+                "Total Score": scores[1],
+                "RampUp": scores[2],
+                "Correctness": scores[3],
+                "BusFactor": scores[4],
+                "ResponsiveMaintainer": scores[5],
+                "LicenseScore": scores[6],
+                "Dependency": scores[7]
+                }
         
-        if float(scores['Total Score']) < .5:
-            return Response('Package did not recieve score above .5', status=status.HTTP_400_BAD_REQUEST)
+            if float(scores['Total Score']) < 0:
+                return Response('Package did not recieve score above .5', status=status.HTTP_400_BAD_REQUEST)
+            
+            #section used to retrieve the zip data from the given url
+            http_response = urlopen(url + '/archive/refs/heads/master.zip')
+            
+            test1 = http_response.read()
+            
+            data = base64.b64encode(test1).decode('utf-8')
+            
+            request_data['data']['Content'] = data
         
         serializer = PackageSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            returnData['Name'] = request_data['metadata']['Name']
+            returnData['Version'] = request_data['metadata']['Version']
+            returnData['ID'] = request_data['metadata']['ID']
+            return Response(returnData, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -132,7 +150,7 @@ def package_rate(request, id):
     except Package.DoesNotExist:
         return HttpResponse(status=404)
 
-    if request.method == 'GET':
+    if request.method == 'GET' and not post.data.URL == '':
         url = post.data.URL
 
         r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
@@ -150,6 +168,7 @@ def package_rate(request, id):
             }
 
         return Response(scores, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
 def db_reset(request):
