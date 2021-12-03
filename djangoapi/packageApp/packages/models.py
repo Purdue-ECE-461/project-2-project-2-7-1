@@ -5,8 +5,8 @@ from django.db.models.fields import BinaryField
 
 
 class data(models.Model):
-    Content = models.BinaryField()
-    URL = models.CharField(max_length=70)
+    Content = models.BinaryField(default=b'')
+    URL = models.CharField(max_length=70, default='')
     JSProgram = models.TextField()
 
     def __str__(self) -> str:

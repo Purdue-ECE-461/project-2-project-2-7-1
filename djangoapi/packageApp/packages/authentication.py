@@ -7,6 +7,9 @@ import pytz
 from packages.models import TokenCounter
 
 class ExpiringTokenAuthentication(TokenAuthentication):
+    
+    keyword = 'bearer'
+    
     def authenticate_credentials(self, key):
         
         utc = pytz.UTC
