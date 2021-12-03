@@ -16,30 +16,92 @@
     </div>
 
     <form>  
-      Enter NPM Module Link  
-      <input type="text" id = "ModuleLink" name="ModuleLink" required> 
+      Enter Your Username      
+      <input type="text" aria-labelledby = "Username" id = "Username" name="Username" minlength="5" maxlength="20" required>
+      Password
+      <input type="password" aria-labelledby = "pwd" id = "pwd" name="pwd" minlength="5" maxlength="50" required> 
     </form>
 
-    <td class="select"><select name="selectedService" id="selectedService" >
-      <option value="upload">Upload</option>
-      <option value="download">Download</option>
-      <option value="evaluate">Evaluate</option>
-      <option value="delete">Delete</option>
-      </select>
-    </td>
+    <form>  
+      Enter NPM Module Link  
+      <input type="text" aria-labelledby = "moduleLink" id = "moduleLink" name="moduleLink" maxlength="2048"> 
 
-    <button onclick="queryApi()">Submit Request</button>
+      <td class="select"><select aria-label="selectedService" name="selectedService" id="selectedService" >
+        <option value="ingest">Ingest</option> 
+        <option value="upload">Upload</option>
+        <option value="download">Download</option>
+        <option value="evaluate">Evaluate</option>
+        <option value="delete">Delete</option>
+        </select>
+      </td>
+  
+      <button onclick="queryApi()">Submit Request</button>
+    </form>
 
     <script>
-      function queryApi() {
-        var service = document.getElementById("selectedService");
-        var npmUrl = document.getElementById("ModuleLink");
-        if(npmUrl.validity.valueMissing){
-          alert("Link to NPM module must be provided");
+      let apiAddres = "http://127.0.0.1:8000";
+      //let apiAddres = "webpage sent by Anthony"
+
+      //Function for autentication and verify already has given credentials
+      function getCredentials(){
+        var path = "/project2/authenticate";
+        var usr = document.getElementById("Username");
+        var pwd = document.getElementById("pwd");
+        
+        if(usr.validity.valueMissing){
+          alert("Please type in your username");
+          return;
         }
+
+        if(pwd.validity.valueMissing){
+          alert("Please Type in your password");
+          return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", apiAddres + path, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({"User": {
+          "name": usr,
+          "isAdmin": true
+          },
+          "Secret": {
+              "password": pwd
+          }}));
+        // xhr.onload = function(){
+        //   alert(this.responseText);
+        //   console.log(this.responseText);
+        // };
+        alert(xhr.responseText);
+        return;
+      }
+
+
+      //ece461defaultadmin
+      //correcthorsebatterystaple123(!__+@**(A
+
+      function serviceIngest(){
+        var npmUrl = document.getElementById("moduleLink").value;
+        if(npmUrl == ""){
+          alert("Link to NPM module must be provided");
+          return;
+        }
+        alert("i am here");
+        alert("link == " + npmUrl.value);
+        return;
+      }
+
+      function queryApi() {
+        var service = document.getElementById("selectedService").value;
         //<!-- Missing if statements for too long of an input for security case
         // Still need to decide what is the longest possible string-->
-        if(service == "upload"){
+        
+        getCredentials();
+        
+        if(service == "ingest"){
+            //ingest from link
+            serviceIngest();
+        } else if(service == "upload"){
             //upload api query
         } else if(service == "download"){
             //download api query
@@ -48,6 +110,7 @@
         } else {
             //delete api query
         }
+
       }
     </script>
 
