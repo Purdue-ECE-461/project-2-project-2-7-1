@@ -103,6 +103,7 @@
         var xhrIng = new XMLHttpRequest();
         xhrIng.open("POST", apiAddres + path, false);
         xhrIng.setRequestHeader('Authorization', 'bearer 73af538c1204941ac662620cd36556d1207be681');
+        xhrIng.setRequestHeader('Content-Type', 'application/json');
         xhrIng.onload = function(){
           if (xhrIng.readyState === xhrIng.DONE) {
             if (xhrIng.status === 200){
