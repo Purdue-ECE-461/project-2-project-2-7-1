@@ -26,7 +26,9 @@
       Enter NPM Module Link  
       <input type="text" aria-labelledby = "moduleLink" id = "moduleLink" name="npmURL" maxlength="2048" > 
     </form>
-
+  
+    <input type="file" id="upload-file" name="upload-file">
+  
     <td class="select"><select aria-label="selectedService" name="selectedService" id="selectedService" >
       <option value="ingest">Ingest</option> 
       <option value="upload">Upload</option>
@@ -106,7 +108,7 @@
         xhrIng.onload = function(){
           if (xhrIng.readyState === xhrIng.DONE) {
             if (xhrIng.status === 200){
-              alert("Package Ingested Succesfully" + xhrIng.responseText);
+              //alert("Package Ingested Succesfully" + xhrIng.responseText);
             }
           }
         };
@@ -125,6 +127,90 @@
         return;
       }
 
+      function serviceUpload(credentials){
+        var filesObj = document.getElementsByName("upload-file").item(0);
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        var path = "/project2/package";
+
+        if(file == ""){
+          alert("If you want to upload a file please provide one to upload");
+          return;
+        }
+        if(npmUrl == ""){
+          alert("Please provide the link you want the file to be associated with");
+          return;
+        }
+        var file = filesObj.files.item(0);
+        var fileType = file.name.split(".").at(-1);
+        if(fileType != "zip"){
+          alert("Please provide a zipped file to upload");
+          return;
+        }
+
+        // var fileReader = new FileReader();
+
+        // var zipFileLoaded = new JSZip(file);
+        // for (var nameOfFileContainedInZipFile in zipFileLoaded.files){
+        //   var fileContainedInZipFile = zipFileLoaded.files[nameOfFileContainedInZipFile];
+
+        //   var linkFileContained = document.createElement("a");
+        //   linkFileContained.innerHTML = nameOfFileContainedInZipFile;
+        //   linkFileContained.href = "#";
+        //   linkFileContained.file = fileContainedInZipFile;
+        //   linkFileContained.onclick = displayFileAsText;
+        //   var liFileContained = document.createElement("li");
+        //   liFileContained.appendChild(linkFileContained);
+        //   ulFilesContained.appendChild(liFileContained);
+        // }
+        // fileReader.readAsArrayBuffer(file);
+        // alert(file.name);
+        // alert(fileReader.result);
+
+        // fileReader.onload = function(fileLoadedEvent) 
+        // {
+        //   var zipFileLoaded = new JSZip(fileLoadedEvent.target.result);
+
+        //   var ulFilesContained = document.getElementById("ulFilesContained");
+
+        //   for (var nameOfFileContainedInZipFile in zipFileLoaded.files)
+        //   {
+        //     var fileContainedInZipFile = zipFileLoaded.files[nameOfFileContainedInZipFile];
+
+        //     var linkFileContained = document.createElement("a");
+        //     linkFileContained.innerHTML = nameOfFileContainedInZipFile;
+        //     linkFileContained.href = "#";
+        //     linkFileContained.file = fileContainedInZipFile;
+        //     linkFileContained.onclick = displayFileAsText;
+        //     var liFileContained = document.createElement("li");
+        //     liFileContained.appendChild(linkFileContained);
+        //     ulFilesContained.appendChild(liFileContained);
+        //   }
+
+        // };
+
+        var xhrUp = new XMLHttpRequest();
+        xhrUp.open("POST", apiAddres + path, false);
+        xhrUp.setRequestHeader('Authorization', 'bearer 73af538c1204941ac662620cd36556d1207be681');
+        xhrUp.onload = function(){
+          if (xhrUp.readyState === xhrUp.DONE) {
+            if (xhrUp.status === 200){
+              //alert("Package Ingested Succesfully" + xhrUp.responseText);
+            }
+          }
+        };
+        var name = file.name;
+        xhrUp.send(JSON.stringify({"metadata": {
+            "Name": name,
+            "Version": "1.0.0",
+            "ID": name
+          },
+          "data": {
+              "URL": npmUrl,
+              "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+          }
+        }));
+        return;
+      }
       function queryApi() {
         var service = document.getElementById("selectedService").value;
         //<!-- Missing if statements for too long of an input for security case
@@ -136,6 +222,7 @@
             serviceIngest(credentials);
         } else if(service == "upload"){
             //upload api query
+            serviceUpload(credentials);
         } else if(service == "download"){
             //download api query
         } else if(service == "evaluate"){
