@@ -11,6 +11,9 @@
     <title>461 Module Registry</title>
   </head>
   <body>
+    <script type="text/javascript" src="./node_modules/jszip/dist/jszip.js" ></script>
+    <script type="text/javascript" src="./node_modules/jszip-utils/dist/jszip-utils.js" ></script>
+
     <div class="container">
         NPM Module Registry, Team 7
     </div>
@@ -33,15 +36,17 @@
       <option value="ingest">Ingest</option> 
       <option value="upload">Upload</option>
       <option value="download">Download</option>
-      <option value="evaluate">Evaluate</option>
+      <option value="rate">Rate</option>
       <option value="delete">Delete</option>
+      <option value="reset">Reset</option>
       </select>
     </td>
 
     <button onclick="queryApi()">Submit Request</button>
 
-    <script>
+    <script>      
       let apiAddres = "http://127.0.0.1:8080";
+      let temp_creds = "bearer 73af538c1204941ac662620cd36556d1207be681"
       //let apiAddres = "webpage sent by Anthony"
 
       //Function for autentication and verify already has given credentials
@@ -78,7 +83,6 @@
           "Secret": {
               "password": pwd
           }}));
-          
         return xhr.responseText;
       }
 
@@ -99,12 +103,10 @@
         }
 
         var name = npmUrl.split("/").at(-1);
-        alert(apiAddres + path);
-        alert(credentials);
         
         var xhrIng = new XMLHttpRequest();
         xhrIng.open("POST", apiAddres + path, false);
-        xhrIng.setRequestHeader('Authorization', 'bearer 73af538c1204941ac662620cd36556d1207be681');
+        xhrIng.setRequestHeader('Authorization', temp_creds);
         xhrIng.setRequestHeader('Content-Type', 'application/json');
         xhrIng.onload = function(){
           if (xhrIng.readyState === xhrIng.DONE) {
@@ -113,7 +115,7 @@
             }
           }
         };
-        alert(npmUrl);
+        
         xhrIng.send(JSON.stringify({"metadata": {
             "Name": name,
             "Version": "1.0.0",
@@ -124,9 +126,42 @@
               "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
           }
         }));
-        
+        alert(xhrIng.responseText);
         return;
       }
+
+      function inputFileLoaded(){
+          var inputFile = document.getElementById("upload-file");
+          alert(inputFile.files[0].rawFile);
+          var zipFileToLoad = inputFile.files[0];
+
+          var fileReader = new FileReader();
+
+          fileReader.onload = function(fileLoadedEvent) 
+          {
+            var zip = new JSZip();
+            var zipFileLoaded = zip.file(fileLoadedEvent.target.result);
+
+            var ulFilesContained = document.getElementById("ulFilesContained");
+
+            for (var nameOfFileContainedInZipFile in zipFileLoaded.files)
+            {
+              var fileContainedInZipFile = zipFileLoaded.files[nameOfFileContainedInZipFile];
+
+              var linkFileContained = document.createElement("a");
+              linkFileContained.innerHTML = nameOfFileContainedInZipFile;
+              linkFileContained.href = "#";
+              linkFileContained.file = fileContainedInZipFile;
+              linkFileContained.onclick = displayFileAsText;
+              var liFileContained = document.createElement("li");
+              liFileContained.appendChild(linkFileContained);
+              ulFilesContained.appendChild(liFileContained);
+            }
+
+          };
+
+          alert(fileReader.readAsArrayBuffer(zipFileToLoad));
+        }
 
       function serviceUpload(credentials){
         var filesObj = document.getElementsByName("upload-file").item(0);
@@ -147,51 +182,12 @@
           alert("Please provide a zipped file to upload");
           return;
         }
-
-        // var fileReader = new FileReader();
-
-        // var zipFileLoaded = new JSZip(file);
-        // for (var nameOfFileContainedInZipFile in zipFileLoaded.files){
-        //   var fileContainedInZipFile = zipFileLoaded.files[nameOfFileContainedInZipFile];
-
-        //   var linkFileContained = document.createElement("a");
-        //   linkFileContained.innerHTML = nameOfFileContainedInZipFile;
-        //   linkFileContained.href = "#";
-        //   linkFileContained.file = fileContainedInZipFile;
-        //   linkFileContained.onclick = displayFileAsText;
-        //   var liFileContained = document.createElement("li");
-        //   liFileContained.appendChild(linkFileContained);
-        //   ulFilesContained.appendChild(liFileContained);
-        // }
-        // fileReader.readAsArrayBuffer(file);
-        // alert(file.name);
-        // alert(fileReader.result);
-
-        // fileReader.onload = function(fileLoadedEvent) 
-        // {
-        //   var zipFileLoaded = new JSZip(fileLoadedEvent.target.result);
-
-        //   var ulFilesContained = document.getElementById("ulFilesContained");
-
-        //   for (var nameOfFileContainedInZipFile in zipFileLoaded.files)
-        //   {
-        //     var fileContainedInZipFile = zipFileLoaded.files[nameOfFileContainedInZipFile];
-
-        //     var linkFileContained = document.createElement("a");
-        //     linkFileContained.innerHTML = nameOfFileContainedInZipFile;
-        //     linkFileContained.href = "#";
-        //     linkFileContained.file = fileContainedInZipFile;
-        //     linkFileContained.onclick = displayFileAsText;
-        //     var liFileContained = document.createElement("li");
-        //     liFileContained.appendChild(linkFileContained);
-        //     ulFilesContained.appendChild(liFileContained);
-        //   }
-
-        // };
+        
+        inputFileLoaded();
 
         var xhrUp = new XMLHttpRequest();
         xhrUp.open("POST", apiAddres + path, false);
-        xhrUp.setRequestHeader('Authorization', 'bearer 73af538c1204941ac662620cd36556d1207be681');
+        xhrUp.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
         xhrUp.onload = function(){
           if (xhrUp.readyState === xhrUp.DONE) {
             if (xhrUp.status === 200){
@@ -212,6 +208,74 @@
         }));
         return;
       }
+
+      function serviceRate(credentials){
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        var name = npmUrl.split("/").at(-1);
+        var path = "/project2/package/" + name + "/rate";
+        if(npmUrl == ""){
+          alert("Please provide the link of the module you want to rate");
+          return;
+        }
+
+        var xhrRate = new XMLHttpRequest();
+        xhrRate.open("GET", apiAddres + path, false);
+        xhrRate.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrRate.onload = function(){
+          if (xhrRate.readyState === xhrRate.DONE) {
+            if (xhrRate.status === 200){
+              alert(xhrRate.responseText);
+            }
+          }
+        };
+        xhrRate.send();
+        return;
+      }
+
+      function serviceDelete(credentials){
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        var name = npmUrl.split("/").at(-1);
+        var path = "/project2/package/" + name;
+        if(npmUrl == ""){
+          alert("Please provide the link of the module you want to delete");
+          return;
+        }
+
+        var xhrDel = new XMLHttpRequest();
+        xhrDel.open("DELETE", apiAddres + path, false);
+        xhrDel.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrDel.onload = function(){
+          if (xhrDel.readyState === xhrDel.DONE) {
+            if (xhrDel.status === 200){
+              alert("Deleted successfuly");              
+            }
+          }
+        };
+        if(confirm("Are you sure you want to delete this module? It cannot be undone later")){
+         xhrDel.send();
+        }
+        return;
+      }
+      
+      function serviceReset(credentials){
+        var path = "/project2/reset";
+
+        var xhrRes = new XMLHttpRequest();
+        xhrRes.open("DELETE", apiAddres + path, false);
+        xhrRes.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrRes.onload = function(){
+          if (xhrRes.readyState === xhrRes.DONE) {
+            if (xhrRes.status === 200){
+              alert("Deleted successfuly");              
+            }
+          }
+        };
+        if(confirm("Are you sure you want to reset the registry? It cannot be undone later")){
+          xhrRes.send();
+        }
+
+        return;
+      }
       function queryApi() {
         var service = document.getElementById("selectedService").value;
         //<!-- Missing if statements for too long of an input for security case
@@ -221,17 +285,21 @@
         if(service == "ingest"){
             //ingest from link
             serviceIngest(credentials);
-        } else if(service == "upload"){
-            //upload api query
-            serviceUpload(credentials);
+        // } else if(service == "upload"){
+        //     //upload api query
+        //     serviceUpload(credentials);
         } else if(service == "download"){
             //download api query
-        } else if(service == "evaluate"){
-            //evaluate api query
-        } else {
+        } else if(service == "rate"){
+            //rate api query
+            serviceRate(credentials);
+        } else if(service == "delete"){
             //delete api query
+            serviceDelete(credentials);
+        } else if(service == "reset"){
+            //reset the entire registry
+            serviceReset(credentials);
         }
-
       }
     </script>
 
