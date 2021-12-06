@@ -178,8 +178,11 @@ def db_reset(request):
         packages = Package.objects.all()
 
         for package in packages:
-            meta_data = metadata.objects.get(pk=package.id)
+            meta_data = metadata.objects.get(pk=package.metadata_id)
             data_data = data.objects.get(pk=package.data_id)
             package.delete()
             meta_data.delete()
             data_data.delete()
+            
+        if len(Package.objects.all()) == 0:
+            return Response(status=status.HTTP_200_OK)

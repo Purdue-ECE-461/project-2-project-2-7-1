@@ -46,7 +46,7 @@
 
     <script>      
       let apiAddres = "http://127.0.0.1:8080";
-      let temp_creds = "bearer 73af538c1204941ac662620cd36556d1207be681"
+      let temp_creds = "bearer d94d9c5ed2c1fe824037db3f51422238fc18989d"
       //let apiAddres = "webpage sent by Anthony"
 
       //Function for autentication and verify already has given credentials
@@ -220,7 +220,8 @@
 
         var xhrRate = new XMLHttpRequest();
         xhrRate.open("GET", apiAddres + path, false);
-        xhrRate.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrRate.setRequestHeader('Content-Type', 'application/json');
+        xhrRate.setRequestHeader('Authorization', temp_creds);
         xhrRate.onload = function(){
           if (xhrRate.readyState === xhrRate.DONE) {
             if (xhrRate.status === 200){
@@ -243,7 +244,8 @@
 
         var xhrDel = new XMLHttpRequest();
         xhrDel.open("DELETE", apiAddres + path, false);
-        xhrDel.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrDel.setRequestHeader('Content-Type', 'application/json');
+        xhrDel.setRequestHeader('Authorization', temp_creds);
         xhrDel.onload = function(){
           if (xhrDel.readyState === xhrDel.DONE) {
             if (xhrDel.status === 200){
@@ -262,7 +264,8 @@
 
         var xhrRes = new XMLHttpRequest();
         xhrRes.open("DELETE", apiAddres + path, false);
-        xhrRes.setRequestHeader('Content-Type', 'application/json','Authorization', temp_creds);
+        xhrRes.setRequestHeader('Content-Type', 'application/json');
+        xhrRes.setRequestHeader('Authorization', temp_creds);
         xhrRes.onload = function(){
           if (xhrRes.readyState === xhrRes.DONE) {
             if (xhrRes.status === 200){
