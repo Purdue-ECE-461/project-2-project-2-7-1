@@ -70,7 +70,7 @@ def package_create(request):
         if 'URL' in request_data['data']:
             url = request_data['data']['URL']
             
-            r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
+            r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/function-final-scoring?' + url)
 
             data = r.content.decode("utf-8")
             scores = data.split(' ')
@@ -153,7 +153,7 @@ def package_rate(request, id):
     if request.method == 'GET' and not post.data.URL == '':
         url = post.data.URL
 
-        r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/module-eval-oh-function?' + url)
+        r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/function-final-scoring?' + url)
 
         data = r.content.decode("utf-8")
         scores = data.split(' ')
