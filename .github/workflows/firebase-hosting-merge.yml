@@ -17,4 +17,4 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ECE461_REPO_REGISTRY }}'
           channelId: live
           projectId: ece461-repo-registry
-          entryPoint: "./webapp"
+          entryPoint: "./webapp/"
