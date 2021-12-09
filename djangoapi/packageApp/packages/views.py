@@ -49,6 +49,7 @@ def package_element(request, id):
         return Response(status=status.HTTP_200_OK)
     elif request.method == 'PUT':
         package_data = JSONParser().parse(request)
+        package_data['metadata'].pop('ID')
         package_serializer = PackageSerializer(post, data=package_data) 
         if package_serializer.is_valid():
             package_serializer.save()
@@ -110,35 +111,40 @@ def package_create(request):
 class ObtainExpiringAuthToken(ObtainAuthToken):
     def put(self, request):
         
-        user, created = User.objects.get_or_create(username=request.data['User']['name'])
+        if User.objects.filter(username=request.data['User']['name']).exists():
+            
         
-        token, created = Token.objects.get_or_create(user_id=user.id)
+            user= User.objects.get(username=request.data['User']['name'])
+       
+            token, created = Token.objects.get_or_create(user_id=user.id)
         
-        counter, created = TokenCounter.objects.get_or_create(token_id=token.user_id, token_hitlimit=1000)
+            counter, created = TokenCounter.objects.get_or_create(token_id=token.user_id, token_hitlimit=1000)
 
-        utc_now = datetime.datetime.utcnow() 
-        utc = pytz.UTC
+            utc_now = datetime.datetime.utcnow()
+            utc = pytz.UTC
+
+            created_token = token.created.replace(tzinfo=utc)
         
-        created_token = token.created.replace(tzinfo=utc)
+            limit = utc_now - datetime.timedelta(hours=24)
         
-        limit = utc_now - datetime.timedelta(hours=24)
-        
-        token_limit = limit.replace(tzinfo=utc)   
-        if not created and created_token < token_limit:
-            token.delete()
-            token = Token.objects.create(user_id=user.id)
-            token.created = datetime.datetime.utcnow()
-            token.save()
+            token_limit = limit.replace(tzinfo=utc)   
+            if not created and created_token < token_limit:
+                token.delete()
+                token = Token.objects.create(user_id=user.id)
+                token.created = datetime.datetime.utcnow()
+                token.save()
             
-        if not created and counter.token_count >= counter.token_hitlimit:
-            counter.token_count = 0
-            counter.save()
-            token.delete()
-            token = Token.objects.create(user_id=user.id)
-            token.created = datetime.datetime.utcnow()
-            token.save()
+            if not created and counter.token_count >= counter.token_hitlimit:
+                counter.token_count = 0
+                counter.save()
+                token.delete()
+                token = Token.objects.create(user_id=user.id)
+                token.created = datetime.datetime.utcnow()
+                token.save()
             
-        return Response('bearer ' + token.key, status=status.HTTP_200_OK)
+            return Response('bearer ' + token.key, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 obtain_expiring_auth_token = ObtainExpiringAuthToken.as_view()
 

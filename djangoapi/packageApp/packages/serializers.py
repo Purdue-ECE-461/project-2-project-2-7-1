@@ -55,3 +55,20 @@ class PackageSerializer(serializers.ModelSerializer):
         metadata_ser = MetaDataSerializer.create(MetaDataSerializer(), validated_data=metadata_data)
         package, created = Package.objects.update_or_create(data=data_ser, metadata=metadata_ser)
         return package
+    
+    def update(self, instance, validated_data):
+        
+        data_data = validated_data.pop('data')
+        data_ser = DataSerializer.update(DataSerializer(),instance=instance.data, validated_data=data_data)
+        metadata_data = validated_data.pop('metadata')
+        metadata_ser = MetaDataSerializer.update(MetaDataSerializer(), instance=instance.metadata,validated_data=metadata_data)
+        
+        #instance.data = validated_data.get('data', instance.data)
+        #instance.metadata = validated_data.get('metadata', instance.metadata)
+        
+        #instance.content = validated_data.get('content', instance.content)
+        #instance.created = validated_data.get('created', instance.created)
+        
+        package = Package.objects.update(data=data_ser, metadata=metadata_ser)
+        
+        return instance
