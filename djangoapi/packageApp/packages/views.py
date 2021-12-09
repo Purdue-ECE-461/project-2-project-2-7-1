@@ -2,7 +2,7 @@ import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from packages.models import Package, metadata, data
 from packages.serializers import PackageSerializer
@@ -17,6 +17,7 @@ import pytz
 from packages.models import TokenCounter
 from urllib.request import urlopen
 import base64
+from django.core.paginator import Paginator
 
 #this commented out section is for specifically downloading the file
         #data = serializer.data
@@ -27,6 +28,21 @@ import base64
         #return response
 
 # Create your views here.
+
+#Potential Pagination
+#@api_view(['POST'])
+#def packages_list(request):
+    
+    #if request.method == 'POST':
+        #list_packages = Package.objects.all() 
+        
+        #num = int(request.query_params['offset'])
+        
+        #paginator = Paginator(list_packages, 10) 
+        
+        #page_obj = paginator.get_page(num)
+        #serialized_posts = [PackageSerializer(post) for post in page_obj]
+        #return Response(serialized_posts.data, status=status.HTTP_200_OK)
 
 
 #used for specific id operations
@@ -86,7 +102,7 @@ def package_create(request):
                 "Dependency": scores[7]
                 }
         
-            if float(scores['Total Score']) < 0:
+            if float(scores['Total Score']) < .5:
                 return Response('Package did not recieve score above .5', status=status.HTTP_400_BAD_REQUEST)
             
             #section used to retrieve the zip data from the given url
