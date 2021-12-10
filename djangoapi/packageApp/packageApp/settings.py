@@ -150,7 +150,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': ( 
-        'packages.authentication.ExpiringTokenAuthentication',),
+        'packages.authentication.ExampleAuthentication',
+        ),
    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser', ),
    'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.UserRateThrottle'

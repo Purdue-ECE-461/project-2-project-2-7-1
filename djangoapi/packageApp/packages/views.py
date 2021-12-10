@@ -122,9 +122,55 @@ def package_create(request):
             returnData['ID'] = request_data['metadata']['ID']
             return Response(returnData, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+ 
+@authentication_classes([])
+@permission_classes([])   
+@api_view(['PUT'])   
+def testauthtoken(request):
+    
+    if request.method == 'PUT':
+        if User.objects.filter(username=request.data['User']['name']).exists():
+            
+        
+            user= User.objects.get(username=request.data['User']['name'])
+       
+            token, created = Token.objects.get_or_create(user_id=user.id)
+        
+            counter, created = TokenCounter.objects.get_or_create(token_id=token.user_id, token_hitlimit=1000)
+
+            utc_now = datetime.datetime.utcnow()
+            utc = pytz.UTC
+
+            created_token = token.created.replace(tzinfo=utc)
+        
+            limit = utc_now - datetime.timedelta(hours=24)
+        
+            token_limit = limit.replace(tzinfo=utc)   
+            if not created and created_token < token_limit:
+                token.delete()
+                token = Token.objects.create(user_id=user.id)
+                token.created = datetime.datetime.utcnow()
+                token.save()
+            
+            if not created and counter.token_count >= counter.token_hitlimit:
+                counter.token_count = 0
+                counter.save()
+                token.delete()
+                token = Token.objects.create(user_id=user.id)
+                token.created = datetime.datetime.utcnow()
+                token.save()
+            
+            return Response('bearer ' + token.key, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+    
 
 
 class ObtainExpiringAuthToken(ObtainAuthToken):
+    
+    authentication_classes = []
+    permission_classes = []
+    
     def put(self, request):
         
         if User.objects.filter(username=request.data['User']['name']).exists():
