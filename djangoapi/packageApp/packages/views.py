@@ -83,9 +83,15 @@ def package_create(request):
         request_data = request.data
         #section to check if package is hihgly rated enough
         
+        if request_data is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
         #if package has URL then it needs to be ingested and scored
         if 'URL' in request_data['data']:
             url = request_data['data']['URL']
+            
+            if not isinstance(url, str):
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             
             r = requests.get('https://us-central1-ece461-repo-registry.cloudfunctions.net/function-final-scoring?' + url)
 
