@@ -180,4 +180,5 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_HEADERS = default_headers + (
     'x-authorization',
+    'X-Authorization'
 )
