@@ -3,9 +3,9 @@ from django.urls import path
 from packages import views
 
 urlpatterns = [
-    path('project2/package/<id>', views.package_element),
-    path('project2/authenticate', views.testauthtoken),
-    path('project2/reset', views.db_reset),
-    path('project2/package', views.package_create),
-    path('project2/package/<id>/rate', views.package_rate),
+    path('package/<id>', views.package_element),
+    path('authenticate', views.testauthtoken),
+    path('reset', views.db_reset),
+    path('package', views.package_create),
+    path('package/<id>/rate', views.package_rate),
 ]
