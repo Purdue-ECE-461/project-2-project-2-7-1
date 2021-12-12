@@ -64,7 +64,7 @@
 
       //Function for autentication and verify already has given credentials
       function getCredentials(){
-        var path = "/project2/authenticate";
+        var path = "/authenticate";
         var usr = document.getElementById("Username").value;
         var pwd = document.getElementById("pwd").value;
         if(usr == ""){
@@ -102,7 +102,7 @@
       //correcthorsebatterystaple123(!__+@**(A
 
       function serviceIngest(credentials){
-        var path = "/project2/package";
+        var path = "/package";
         var npmUrl = document.getElementsByName("npmURL").item(0).value;
         if(npmUrl == ""){
           alert("Link to NPM module must be provided");
@@ -147,7 +147,7 @@
       function serviceRate(credentials){
         var npmUrl = document.getElementsByName("npmURL").item(0).value;
         var name = npmUrl.split("/").at(-1);
-        var path = "/project2/package/" + name + "/rate";
+        var path = "/package/" + name + "/rate";
         if(npmUrl == ""){
           alert("Please provide the link of the module you want to rate");
           return;
@@ -173,7 +173,7 @@
       function serviceDelete(credentials){
         var npmUrl = document.getElementsByName("npmURL").item(0).value;
         var name = npmUrl.split("/").at(-1);
-        var path = "/project2/package/" + name;
+        var path = "/package/" + name;
         if(npmUrl == ""){
           alert("Please provide the link of the module you want to delete");
           return;
@@ -199,7 +199,7 @@
       }
       
       function serviceReset(credentials){
-        var path = "/project2/reset";
+        var path = "/reset";
 
         var xhrRes = new XMLHttpRequest();
         xhrRes.open("DELETE", apiAddres + path, true);
