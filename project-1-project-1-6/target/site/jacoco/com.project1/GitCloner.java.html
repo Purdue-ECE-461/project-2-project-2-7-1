@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GitCloner.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.project1</a> &gt; <span class="el_source">GitCloner.java</span></div><h1>GitCloner.java</h1><pre class="source lang-java linenums">package com.project1;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import java.nio.file.Paths;
+import java.io.File;
+
+<span class="nc" id="L10">public class GitCloner {</span>
+<span class="nc" id="L11">    private static final Logger logger = LogManager.getLogger(GitCloner.class);</span>
+<span class="nc" id="L12">    private static Git result = null;</span>
+    public static boolean Clone(String repoUrl, String someName){
+
+        try {
+<span class="nc" id="L16">            logger.debug(&quot;Cloning &quot;+repoUrl+&quot; into ./target/&quot;+someName);</span>
+<span class="nc" id="L17">            File file = new File(&quot;./target/&quot;+someName);</span>
+<span class="nc" id="L18">            deleteFolder(file);</span>
+<span class="nc" id="L19">            result = Git.cloneRepository()</span>
+<span class="nc" id="L20">                .setURI(repoUrl)</span>
+<span class="nc" id="L21">                .setDirectory(Paths.get(&quot;./target/&quot; + someName).toFile())</span>
+<span class="nc" id="L22">                .call();</span>
+<span class="nc" id="L23">            logger.debug(&quot;cloning successful&quot;);</span>
+<span class="nc" id="L24">        } catch (GitAPIException e) {</span>
+<span class="nc" id="L25">            logger.debug(&quot;error in cloning github repository&quot;);</span>
+<span class="nc" id="L26">            return false;</span>
+<span class="nc" id="L27">        }</span>
+<span class="nc" id="L28">        return true;</span>
+    }
+    static void deleteFolder(File file){
+<span class="nc bnc" id="L31" title="All 4 branches missed.">        if(file != null &amp;&amp; file.listFiles() != null) {</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">            for (File subFile : file.listFiles()) {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                if (subFile.isDirectory()) {</span>
+<span class="nc" id="L34">                    deleteFolder(subFile);</span>
+                } else {
+<span class="nc" id="L36">                    subFile.delete();</span>
+                }
+            }
+        }
+<span class="nc" id="L40">        file.delete();</span>
+<span class="nc" id="L41">    }</span>
+    public static void close(){
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if(result == null){</span>
+<span class="nc" id="L44">            return;</span>
+        }
+<span class="nc" id="L46">        result.close();</span>
+<span class="nc" id="L47">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

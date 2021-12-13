@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">app</a> &gt; <a href="index.source.html" class="el_package">com.project1</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package com.project1;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.commons.io.FileDeleteStrategy;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.util.Collections;
+import java.util.List;
+import java.net.URL;
+import com.google.cloud.functions.HttpFunction;
+import com.google.cloud.functions.HttpRequest;
+import com.google.cloud.functions.HttpResponse;
+
+
+<span class="nc" id="L21">public class App implements HttpFunction</span>
+{
+
+    public void service(HttpRequest request, HttpResponse response) throws IOException {
+        //INITIALIZE RESPONSE
+<span class="nc" id="L26">        response.setStatusCode(200);</span>
+<span class="nc" id="L27">        response.setContentType(&quot;text/plain&quot;);</span>
+
+        //LOADING ENVIRONMENT VARIABLES
+<span class="nc" id="L30">        String githubToken = System.getenv(&quot;GITHUB_TOKEN&quot;);</span>
+<span class="nc" id="L31">        String logLevel = System.getenv(&quot;LOG_LEVEL&quot;);</span>
+<span class="nc" id="L32">        String logFile = System.getenv(&quot;LOG_FILE&quot;);</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if(githubToken == null){</span>
+<span class="nc" id="L34">            System.out.println(&quot;Missing necessary github token. Exiting application...&quot;);</span>
+<span class="nc" id="L35">            System.exit(1);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        }else if(logFile == null){</span>
+<span class="nc" id="L37">            System.out.println(&quot;Missing necessary log file. Exiting application...&quot;);</span>
+<span class="nc" id="L38">            System.exit(1);</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        }else if(logLevel == null){</span>
+<span class="nc" id="L40">            logLevel = &quot;0&quot;;</span>
+        }
+
+        //CONFIGURE LOGGER
+<span class="nc" id="L44">        System.setProperty(&quot;logFilename&quot;, logFile); //creating system property to be used inside log4j2.xml configuration file</span>
+<span class="nc" id="L45">        Configurator.setRootLevel(decode(logLevel)); //configuring verbosity level based on environment variable</span>
+<span class="nc" id="L46">        final Logger logger = LogManager.getLogger(App.class);</span>
+
+        //MAIN LOGIC
+<span class="nc" id="L49">        BufferedWriter writer = response.getWriter();</span>
+<span class="nc" id="L50">        String urlIn = request.toString().split(&quot;\\?&quot;)[0];//getParameter(&quot;URL&quot;);</span>
+<span class="nc" id="L51">        writer.write(urlIn);</span>
+<span class="nc" id="L52">        System.out.println(&quot;urlIn == &quot;+urlIn);</span>
+
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if(urlIn == null){</span>
+//            Mvn mvn = new Mvn();
+//            mvn.runTests();
+//            try {
+//                System.out.println(mvn + String.format(&quot;%.0f&quot;, ParseJacoco.getCoverage()*100) +&quot;% line coverage achieved&quot;);
+//            } catch (Exception e) {
+//                System.out.println(&quot;Test runs failed&quot;);
+//                System.exit(1);
+//            }
+//            System.exit(0);
+<span class="nc" id="L64">        writer.write(&quot;PLEASE PROVIDE A MODULE LINK&quot;);</span>
+        }else{
+            //READ INPUT
+<span class="nc" id="L67">            InputReader.read(urlIn);</span>
+<span class="nc" id="L68">            List&lt;String&gt; owners =  InputReader.getOwners();</span>
+<span class="nc" id="L69">            List&lt;String&gt; names = InputReader.getNames();</span>
+<span class="nc" id="L70">            List&lt;String&gt; urls = InputReader.getUrls();</span>
+
+            //URL FILE COULD NOT BE READ
+<span class="nc bnc" id="L73" title="All 4 branches missed.">            if(owners == null || names == null){</span>
+<span class="nc" id="L74">                System.out.println(&quot;Could not read URL file&quot;);</span>
+<span class="nc" id="L75">                System.exit(1);</span>
+            }
+
+            //CLONE, REQUEST, CALCULATE
+<span class="nc" id="L79">            logger.debug(&quot;CLONING, REQUESTING AND CALCULATING...&quot;);</span>
+<span class="nc" id="L80">            List&lt;Module&gt; modules = new ArrayList&lt;&gt;();</span>
+            Module module;
+
+            //ITERATE THROUGH LIST OF REPOSITORIES
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            for(int i = 0; i &lt; urls.size(); i++){</span>
+<span class="nc" id="L85">                String owner = owners.get(i);</span>
+<span class="nc" id="L86">                String name = names.get(i);</span>
+<span class="nc" id="L87">                String url = urls.get(i);</span>
+
+
+                //WRONGLY FORMATTED URL - COULD NOT RETRIEVE OWNER/REPOSITORY PAIR - CONTINUE TO NEXT ITERATION
+<span class="nc bnc" id="L91" title="All 4 branches missed.">                if(owner.isEmpty() || name.isEmpty()){</span>
+<span class="nc" id="L92">                    module = new Module(null);</span>
+<span class="nc" id="L93">                    module.setUrl(url);</span>
+<span class="nc" id="L94">                    modules.add(module);</span>
+<span class="nc" id="L95">                    continue;</span>
+                }
+
+                //CLONING REPOSITORY LOCALLY
+<span class="nc" id="L99">                String cloneURL = &quot;https://github.com/&quot; + owner + &quot;/&quot; + name;</span>
+<span class="nc" id="L100">                boolean cloningSuccess = GitCloner.Clone(cloneURL, name);</span>
+
+                //POPULATING STATISTICS FROM GITHUB API
+<span class="nc" id="L103">                GithubStats stats = new GithubStats();</span>
+<span class="nc" id="L104">                stats.populateStatistics(owner, name, githubToken);</span>
+
+                //POPULATING STATISTICS FROM CLONED REPO.
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                if(cloningSuccess){</span>
+                    //CHECKING LICENSE COMPATIBILITY FROM LOCALLY CLONED REPO
+<span class="nc" id="L109">                    License license = new License();</span>
+<span class="nc" id="L110">                    String readmePath = license.findReadme(new File(&quot;target/&quot; + name));</span>
+<span class="nc" id="L111">                    String readmeContent = license.getFileString(readmePath);</span>
+<span class="nc" id="L112">                    boolean compatibility = license.getLicenseCompatibility(readmeContent);</span>
+<span class="nc" id="L113">                    stats.setLicenseCompatibility(compatibility);</span>
+
+                    //COUNTING LINES OF CODE IN ROOT REPOSITORY AND TEST REPOSITORY
+<span class="nc" id="L116">                    Cloc c = new Cloc(&quot;target/&quot;+name);</span>
+<span class="nc" id="L117">                    c.count();</span>
+
+<span class="nc" id="L119">                    stats.setCommentRatio(c.getCommentRatio());</span>
+<span class="nc" id="L120">                    stats.setTestRatio(c.getTestRatio());</span>
+                }
+
+                //CALCULATE FINAL METRICS
+<span class="nc" id="L124">                module = new Module(stats);</span>
+<span class="nc" id="L125">                module.setUrl(url);</span>
+<span class="nc" id="L126">                module.calculateMetrics();</span>
+
+<span class="nc" id="L128">                modules.add(module);</span>
+
+<span class="nc" id="L130">                GitCloner.close();</span>
+<span class="nc" id="L131">                FileDeleteStrategy.FORCE.delete(new File(&quot;./target/&quot;+names.get(i)));</span>
+            }
+
+<span class="nc" id="L134">            Collections.sort(modules, Collections.reverseOrder());</span>
+            //System.out.println(&quot;URL NET_SCORE RAMP_UP_SCORE CORRECTNESS_SCORE BUS_FACTOR_SCORE RESPONSIVE_MAINTAINER_SCORE LICENSE_SCORE DEPENDENCIES_SCORE&quot;);
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            for(Module m : modules){</span>
+<span class="nc" id="L137">                writer.write(m.toString());</span>
+<span class="nc" id="L138">            }</span>
+
+<span class="nc" id="L140">            System.exit(0);</span>
+        }
+<span class="nc" id="L142">    }</span>
+
+    static Level decode(String level){
+
+<span class="nc bnc" id="L146" title="All 3 branches missed.">        switch (level){</span>
+            case &quot;1&quot;:
+<span class="nc" id="L148">                return Level.INFO;</span>
+            case &quot;2&quot;:
+<span class="nc" id="L150">                return Level.DEBUG;</span>
+            default:
+<span class="nc" id="L152">                return Level.OFF;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

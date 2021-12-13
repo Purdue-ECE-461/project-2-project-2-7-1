@@ -1,0 +1,15 @@
+# Created at 2021-11-15T19:55:18.884
+WARNING: An illegal reflective access operation has occurred
+
+# Created at 2021-11-15T19:55:18.885
+WARNING: Illegal reflective access by retrofit2.Platform (file:/C:/Users/sebmo/.m2/repository/com/squareup/retrofit2/retrofit/2.9.0/retrofit-2.9.0.jar) to constructor java.lang.invoke.MethodHandles$Lookup(java.lang.Class,int)
+
+# Created at 2021-11-15T19:55:18.886
+WARNING: Please consider reporting this to the maintainers of retrofit2.Platform
+
+# Created at 2021-11-15T19:55:18.886
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+
+# Created at 2021-11-15T19:55:18.887
+WARNING: All illegal access operations will be denied in a future release
+

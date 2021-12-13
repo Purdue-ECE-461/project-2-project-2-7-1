@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>461 Module Registry</title>
+  </head>
+  <body>
+    <script type="text/javascript" src="./node_modules/jszip/dist/jszip.js" ></script>
+    <script type="text/javascript" src="./node_modules/jszip-utils/dist/jszip-utils.js" ></script>
+
+    <div class="container">
+        NPM Module Registry, Team 7
+    </div>
+
+    <form>  
+      Enter Your Username      
+      <input type="text" aria-labelledby = "Username" id = "Username" name="Username" minlength="5" maxlength="25" required>
+      Password
+      <input type="password" aria-labelledby = "pwd" id = "pwd" name="pwd" minlength="5" maxlength="50" required> 
+    </form>
+
+    <form>  
+      Enter NPM Module Link  
+      <input type="text" aria-labelledby = "moduleLink" id = "moduleLink" name="npmURL" maxlength="2048" > 
+    </form>
+  
+    <input type="file" id="upload-file" name="upload-file">
+  
+    <td class="select"><select aria-label="selectedService" name="selectedService" id="selectedService" >
+      <option value="ingest">Ingest</option> 
+      <option value="upload">Upload</option>
+      <option value="download">Download</option>
+      <option value="rate">Rate</option>
+      <option value="delete">Delete</option>
+      <option value="reset">Reset</option>
+      </select>
+    </td>
+
+    <button onclick="queryApi()">Submit Request</button>
+
+    <script>      
+      let apiAddres = "https://package-app-oq6m2qssha-uc.a.run.app";
+      //let apiAddres = "webpage sent by Anthony"
+
+      //Function for autentication and verify already has given credentials
+      function getCredentials(){
+        var path = "/authenticate";
+        var usr = document.getElementById("Username").value;
+        var pwd = document.getElementById("pwd").value;
+        if(usr == ""){
+          alert("Please type in your username");
+          return;
+        }
+
+        if(pwd == ""){
+          alert("Please Type in your password");
+          return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", apiAddres + path, false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function(){
+          if (xhr.readyState === xhr.DONE) {
+            if (xhr.status === 200){
+              //alert("Query sent succesfuly");
+            }
+          }
+        };
+        
+        xhr.send(JSON.stringify({"User": {
+          "name": usr,
+          "isAdmin": true
+          },
+          "Secret": {
+              "password": pwd
+          }}));
+        return xhr.responseText;
+      }
+
+      //ece461defaultadmin
+      //correcthorsebatterystaple123(!__+@**(A
+
+      function serviceIngest(credentials){
+        var path = "/package";
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        if(npmUrl == ""){
+          alert("Link to NPM module must be provided");
+          return;
+        }
+
+        if(!npmUrl.includes("/")){
+          alert("Please provide a valid link for ingestion");
+          return;
+        }
+
+        var name = npmUrl.split("/").at(-1);
+        
+        var xhrIng = new XMLHttpRequest();
+        xhrIng.open("POST", apiAddres + path, true);
+        xhrIng.setRequestHeader('Content-Type', 'application/json');
+        xhrIng.setRequestHeader('X-Authorization', credentials);
+        xhrIng.onload = function(){
+          if (xhrIng.readyState === xhrIng.DONE) {
+            if (xhrIng.status === 201){
+              alert("Package Ingested Succesfully" + xhrIng.responseText);
+            } else{
+              alert("Error "+ xhrIng.status)
+            }
+          }
+        };
+        
+        xhrIng.send(JSON.stringify({"metadata": {
+            "Name": name,
+            "Version": "1.0.0",
+            "ID": name
+          },
+          "data": {
+              "URL": npmUrl,
+              "JSProgram": "if (process.argv.length === 7) {\nconsole.log('Success')\nprocess.exit(0)\n} else {\nconsole.log('Failed')\nprocess.exit(1)\n}\n"
+          }
+        }));
+        alert(xhrIng.responseText);
+        return;
+      }
+
+      function serviceRate(credentials){
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        var name = npmUrl.split("/").at(-1);
+        var path = "/package/" + name + "/rate";
+        if(npmUrl == ""){
+          alert("Please provide the link of the module you want to rate");
+          return;
+        }
+
+        var xhrRate = new XMLHttpRequest();
+        xhrRate.open("GET", apiAddres + path, true);
+        xhrRate.setRequestHeader('Content-Type', 'application/json');
+        xhrRate.setRequestHeader('X-Authorization', credentials);
+        xhrRate.onload = function(){
+          if (xhrRate.readyState === xhrRate.DONE) {
+            if (xhrRate.status === 200){
+              alert(xhrRate.responseText);
+            } else{
+              alert("Error "+ xhrRate.status)
+            }
+          }
+        };
+        xhrRate.send();
+        return;
+      }
+
+      function serviceDelete(credentials){
+        var npmUrl = document.getElementsByName("npmURL").item(0).value;
+        var name = npmUrl.split("/").at(-1);
+        var path = "/package/" + name;
+        if(npmUrl == ""){
+          alert("Please provide the link of the module you want to delete");
+          return;
+        }
+
+        var xhrDel = new XMLHttpRequest();
+        xhrDel.open("DELETE", apiAddres + path, true);
+        xhrDel.setRequestHeader('Content-Type', 'application/json');
+        xhrDel.setRequestHeader('X-Authorization', credentials);
+        xhrDel.onload = function(){
+          if (xhrDel.readyState === xhrDel.DONE) {
+            if (xhrDel.status === 200){
+              alert("Deleted successfuly");              
+            } else{
+              alert("Error "+ xhrDel.status)
+            }
+          }
+        };
+        if(confirm("Are you sure you want to delete this module? It cannot be undone later")){
+         xhrDel.send();
+        }
+        return;
+      }
+      
+      function serviceReset(credentials){
+        var path = "/reset";
+
+        var xhrRes = new XMLHttpRequest();
+        xhrRes.open("DELETE", apiAddres + path, true);
+        xhrRes.setRequestHeader('Content-Type', 'application/json');
+        xhrRes.setRequestHeader('X-Authorization', credentials);
+        xhrRes.onload = function(){
+          if (xhrRes.readyState === xhrRes.DONE) {
+            if (xhrRes.status === 200){
+              alert("Deleted successfuly");              
+            } else{
+              alert("Error "+ xhrRes.status)
+            }
+          }
+        };
+        if(confirm("Are you sure you want to reset the registry? It cannot be undone later")){
+          xhrRes.send();
+        }
+
+        return;
+      }
+      function queryApi() {
+        var service = document.getElementById("selectedService").value;
+        //<!-- Missing if statements for too long of an input for security case
+        // Still need to decide what is the longest possible string-->
+        
+        var tempcredentials = getCredentials();
+        var singleQuote = tempcredentials.replace("\"","" );
+        var credentials= singleQuote.replace("\"","" );
+
+        if(service == "ingest"){
+            //ingest from link
+            serviceIngest(credentials);
+        // } else if(service == "upload"){
+        //     //upload api query
+        //     serviceUpload(credentials);
+        } else if(service == "download"){
+            //download api query
+        } else if(service == "rate"){
+            //rate api query
+            serviceRate(credentials);
+        } else if(service == "delete"){
+            //delete api query
+            serviceDelete(credentials);
+        } else if(service == "reset"){
+            //reset the entire registry
+            serviceReset(credentials);
+        }
+      }
+    </script>
+
+    <!--Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  </body>
+</html>
