@@ -14,7 +14,7 @@ class ExampleAuthentication(BaseAuthentication):
         
         token_string = request.META.get('HTTP_X_AUTHORIZATION') # get the username request header
         
-        if token_string == None and path == '/project2/authenticate':
+        if token_string == None and path == '/authenticate':
             try:
                 user = User.objects.get(username=request.data['User']['name'])
             except User.DoesNotExist:
